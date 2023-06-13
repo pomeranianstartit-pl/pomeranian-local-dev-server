@@ -1,0 +1,32 @@
+{
+  "name": "local-api-server",
+  "version": "1.0.0",
+  "description": "local-api-server",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pomeranianstartit-pl/local-api-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pomeranianstartit-pl/local-api-server/issues"
+  },
+  "homepage": "https://github.com/pomeranianstartit-pl/local-api-server#readme",
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^4.6.3"
+  },
+  "engines": {
+    "node": ">=16.15.0",
+    "npm": ">=8.5.5"
+  }
+}
