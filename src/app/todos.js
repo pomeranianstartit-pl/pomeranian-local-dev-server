@@ -1,8 +1,9 @@
 import { Router } from "express";
 import fs from "fs";
+import path from "path"
 
-const dbDir = process.cwd() + "/src/db";
-const todosFilePath = dbDir + "/todos.json";
+const dbDir = path.join(process.cwd(), "src", "db");
+const todosFilePath = path.join(dbDir, "todos.json");
 
 async function createTodos() {
   const todos = [
@@ -41,7 +42,12 @@ async function saveTodos(todos, id) {
     todos,
     id,
   };
-  fs.mkdirSync(dbDir);
+  try {
+    fs.mkdirSync(dbDir);
+  } catch (e) { 
+    //nothing to do folder already exists
+  }
+  
   fs.writeFileSync(todosFilePath, JSON.stringify(newTodos));
 }
 
