@@ -156,7 +156,7 @@ export async function addTodoRoutes() {
     const index = todos.findIndex((todo) => todo.id === +req.params.id);
 
     if (index < 0) {
-      resp.status(404).send({ message: "Todo not found" });
+      return resp.status(404).send({ message: "Todo not found" });
     }
 
     await saveTodos(
