@@ -1,62 +1,66 @@
-import { Router } from 'express'
-import fs from 'fs';
+import { Router } from "express";
+import fs from "fs";
+
+const dbDir = process.cwd() + "/src/db";
+const todosFilePath = dbDir + "/todos.json";
 
 async function createTodos() {
   const todos = [
     {
-      "id": 1,
-      "title": "Todo 1",
-      "createdAt": "2021-05-22T11:20:22.935Z",
-      "author": "Anonymous",
-      "isDone": false,
-      "note": "Done the course"
+      id: 1,
+      title: "Todo 1",
+      createdAt: "2021-05-22T11:20:22.935Z",
+      author: "Anonymous",
+      isDone: false,
+      note: "Done the course",
     },
     {
-      "id": 2,
-      "title": "Todo 2",
-      "createdAt": "2022-05-22T11:20:22.935Z",
-      "doneDate": "2022-05-22T11:20:22.935Z",
-      "author": "Anonymous",
-      "isDone": true,
-      "note": "Register to course"
-    }
+      id: 2,
+      title: "Todo 2",
+      createdAt: "2022-05-22T11:20:22.935Z",
+      doneDate: "2022-05-22T11:20:22.935Z",
+      author: "Anonymous",
+      isDone: true,
+      note: "Register to course",
+    },
   ];
   try {
-    fs.readFileSync('src/db/todos.json', 'utf8')
+    fs.readFileSync(todosFilePath, "utf8");
   } catch (error) {
     await saveTodos(todos, 3);
   }
 }
 
-async function getTodos () {
-  const file = fs.readFileSync('src/db/todos.json', 'utf8')
-  return JSON.parse(file)
+async function getTodos() {
+  const file = fs.readFileSync(todosFilePath, "utf8");
+  return JSON.parse(file);
 }
 
-async function saveTodos (todos, id) {
-    const newTodos = {
-        todos,
-        id
-    }
-    fs.writeFileSync('src/db/todos.json', JSON.stringify(newTodos))
+async function saveTodos(todos, id) {
+  const newTodos = {
+    todos,
+    id,
+  };
+  fs.mkdirSync(dbDir);
+  fs.writeFileSync(todosFilePath, JSON.stringify(newTodos));
 }
 
 export async function addTodoRoutes() {
   await createTodos();
-  const router = Router()
+  const router = Router();
 
-  router.get('/', async (req, resp) => {
-    const {todos} = await getTodos();
+  router.get("/", async (req, resp) => {
+    const { todos } = await getTodos();
     resp.send(todos);
-  })
+  });
 
-  router.post('/', async (req, resp) => {
-    const {todos, id} = await getTodos();
+  router.post("/", async (req, resp) => {
+    const { todos, id } = await getTodos();
 
-    const note = req.body.note || ''
-    const author = req.body.author || 'Anonymous'
-    const createdAt = new Date().toISOString()
-    const title = req.body.title || `Todo ${id}`
+    const note = req.body.note || "";
+    const author = req.body.author || "Anonymous";
+    const createdAt = new Date().toISOString();
+    const title = req.body.title || `Todo ${id}`;
 
     const newTodo = {
       id,
@@ -64,95 +68,98 @@ export async function addTodoRoutes() {
       note,
       author,
       isDone: false,
-      createdAt
-    }
+      createdAt,
+    };
 
     todos.push(newTodo);
-    await saveTodos(todos, id + 1)
+    await saveTodos(todos, id + 1);
 
-    resp.send(newTodo)
-  })
+    resp.send(newTodo);
+  });
 
-  router.get('/:id', async (req, resp) => {
-    const {todos} = await getTodos();
+  router.get("/:id", async (req, resp) => {
+    const { todos } = await getTodos();
 
     if (index < 0) {
-      return resp.status(404).send({message: 'Todo not found'})
+      return resp.status(404).send({ message: "Todo not found" });
     }
 
     resp.send(todos[index]);
-  })
+  });
 
-  router.put('/:id/markAsDone', async (req, resp) => {
-    const {todos, id} = await getTodos();
-    const index = todos.findIndex(todo => todo.id === +req.params.id);
+  router.put("/:id/markAsDone", async (req, resp) => {
+    const { todos, id } = await getTodos();
+    const index = todos.findIndex((todo) => todo.id === +req.params.id);
 
     if (index < 0) {
-      return resp.status(404).send({message: 'Todo not found'})
+      return resp.status(404).send({ message: "Todo not found" });
     }
 
     const todo = todos[index];
 
     if (todo?.isDone) {
-      return resp.status(400).send({message: 'Todo already done'})
+      return resp.status(400).send({ message: "Todo already done" });
     }
 
     const editedTodo = {
       ...todo,
       isDone: true,
-      doneDate: new Date().toISOString()
-    }
+      doneDate: new Date().toISOString(),
+    };
 
     todos[index] = editedTodo;
 
-    await saveTodos(todos, id)
+    await saveTodos(todos, id);
 
-    resp.send(editedTodo)
-  })
+    resp.send(editedTodo);
+  });
 
-  router.put('/:id', async (req, resp) => {
-    const {todos, id} = await getTodos();
-    const index = todos.findIndex(todo => todo.id === +req.params.id);
+  router.put("/:id", async (req, resp) => {
+    const { todos, id } = await getTodos();
+    const index = todos.findIndex((todo) => todo.id === +req.params.id);
 
     if (index < 0) {
-      return resp.status(404).send({message: 'Todo not found'})
+      return resp.status(404).send({ message: "Todo not found" });
     }
 
     const todo = todos[index];
 
     if (todo?.isDone) {
-      return resp.status(400).send({message: 'You cannot change done todo'})
+      return resp.status(400).send({ message: "You cannot change done todo" });
     }
 
-    const note = req.body.note || todo.note
-    const author = req.body.author || todo.author
-    const title = (req.body.title) ? `${req.body.title}` : todo.title;
+    const note = req.body.note || todo.note;
+    const author = req.body.author || todo.author;
+    const title = req.body.title ? `${req.body.title}` : todo.title;
     const editedTodo = {
       ...todo,
       title,
       note,
       author,
-    }
+    };
 
     todos[index] = editedTodo;
 
-    await saveTodos(todos, id)
+    await saveTodos(todos, id);
 
-    resp.send(editedTodo)
-  })
+    resp.send(editedTodo);
+  });
 
-  router.delete('/:id', async (req, resp) => {
-    const {todos, id} = await getTodos();
-    const index = todos.findIndex(todo => todo.id === +req.params.id);
+  router.delete("/:id", async (req, resp) => {
+    const { todos, id } = await getTodos();
+    const index = todos.findIndex((todo) => todo.id === +req.params.id);
 
     if (index < 0) {
-      resp.status(404).send({message: 'Todo not found'})
+      resp.status(404).send({ message: "Todo not found" });
     }
 
-    await saveTodos(todos.filter(el => el.id === index), id)
+    await saveTodos(
+      todos.filter((el) => el.id === index),
+      id
+    );
 
-    resp.send({id: req.params.id})
-  })
+    resp.send({ id: req.params.id });
+  });
 
-  return router
+  return router;
 }
