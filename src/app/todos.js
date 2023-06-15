@@ -160,7 +160,7 @@ export async function addTodoRoutes() {
     }
 
     await saveTodos(
-      todos.filter((el) => el.id === index),
+      todos.filter((el) => el.id !== +req.params.id),
       id
     );
 
