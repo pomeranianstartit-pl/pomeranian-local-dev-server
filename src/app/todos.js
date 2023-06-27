@@ -129,11 +129,6 @@ export async function addTodoRoutes() {
     }
 
     const todo = todos[index];
-
-    if (todo?.isDone) {
-      return resp.status(400).send({ message: "You cannot change done todo" });
-    }
-
     const note = req.body.note || todo.note;
     const author = req.body.author || todo.author;
     const title = req.body.title ? `${req.body.title}` : todo.title;
