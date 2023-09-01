@@ -1,6 +1,6 @@
 import { Router } from "express";
 import fs from "fs";
-import path from "path"
+import path from "path";
 
 const dbDir = path.join(process.cwd(), "src", "db");
 const todosFilePath = path.join(dbDir, "todos.json");
@@ -44,10 +44,10 @@ async function saveTodos(todos, id) {
   };
   try {
     fs.mkdirSync(dbDir);
-  } catch (e) { 
+  } catch (e) {
     //nothing to do folder already exists
   }
-  
+
   fs.writeFileSync(todosFilePath, JSON.stringify(newTodos));
 }
 
@@ -85,12 +85,13 @@ export async function addTodoRoutes() {
 
   router.get("/:id", async (req, resp) => {
     const { todos } = await getTodos();
+    const foundTodo = todos.find((todo) => todo.id === +req.params.id);
 
-    if (index < 0) {
+    if (!foundTodo) {
       return resp.status(404).send({ message: "Todo not found" });
     }
 
-    resp.send(todos[index]);
+    resp.send(foundTodo);
   });
 
   router.put("/:id/markAsDone", async (req, resp) => {
